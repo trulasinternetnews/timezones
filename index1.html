@@ -23,7 +23,7 @@
 
     .container {
       width: 100%;
-      max-width: 860px;
+      max-width: 920px;
       background: #111827;
       border: 1px solid #1e293b;
       border-radius: 14px;
@@ -90,9 +90,16 @@
     .controls-row {
       display: flex;
       flex-wrap: wrap;
-      gap: 0.75rem;
+      gap: 0.6rem;
       align-items: center;
       justify-content: space-between;
+    }
+
+    .add-group {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 0.5rem;
+      align-items: center;
     }
 
     .slider-wrap {
@@ -114,13 +121,25 @@
       cursor: pointer;
     }
 
-    select, button {
+    input[type="text"], select, button {
       background: #1e293b;
       color: #f8fafc;
       border: 1px solid #334155;
       border-radius: 8px;
-      padding: 0.55rem 0.85rem;
+      padding: 0.55rem 0.8rem;
       font-size: 0.9rem;
+    }
+
+    input[type="text"] {
+      min-width: 170px;
+    }
+
+    select {
+      max-width: 300px;
+      cursor: pointer;
+    }
+
+    button {
       cursor: pointer;
     }
 
@@ -152,6 +171,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.3rem;
+      position: relative;
     }
 
     .zone-top {
@@ -163,23 +183,47 @@
 
     .zone-city {
       font-weight: 700;
-      font-size: 1.05rem;
+      font-size: 1.02rem;
       color: #f8fafc;
+    }
+
+    .zone-badges {
+      display: flex;
+      align-items: center;
+      gap: 0.35rem;
     }
 
     .zone-offset {
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.78rem;
+      font-size: 0.76rem;
       color: #38bdf8;
       background: rgba(56, 189, 248, 0.12);
       padding: 0.15rem 0.45rem;
       border-radius: 999px;
+      white-space: nowrap;
+    }
+
+    .remove-btn {
+      background: transparent;
+      border: 1px solid #334155;
+      color: #94a3b8;
+      padding: 0.1rem 0.4rem;
+      font-size: 0.75rem;
+      border-radius: 6px;
+      line-height: 1.2;
+    }
+
+    .remove-btn:hover {
+      color: #f8fafc;
+      background: #7f1d1d;
+      border-color: #ef4444;
     }
 
     .zone-id {
       font-size: 0.78rem;
       color: #64748b;
       font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
+      word-break: break-word;
     }
 
     .zone-clock {
@@ -213,7 +257,7 @@
     <div id="error-banner"></div>
 
     <h1>World Time Zones Explorer</h1>
-    <p class="subtitle">Compare live clocks around the world, check GMT/UTC offsets, or scrub hours forward and backward.</p>
+    <p class="subtitle">Browse world time zones—including Pago Pago and Apia—check live clocks and offsets, or scrub hours forward and backward.</p>
 
     <div class="hero-clocks">
       <div class="hero-box">
@@ -231,10 +275,11 @@
 
     <div class="controls-panel">
       <div class="controls-row">
-        <div>
-          <label for="add-zone-select" style="font-size: 0.88rem; color: #cbd5e1; margin-right: 0.4rem;">Add Time Zone:</label>
-          <select id="add-zone-select"></select>
+        <div class="add-group">
+          <input id="zone-filter-input" type="text" placeholder="Filter (e.g. Pago Pago, Apia)..." aria-label="Filter time zones">
+          <select id="add-zone-select" aria-label="Select time zone"></select>
           <button id="add-zone-btn" type="button">Add Clock</button>
+          <button id="add-all-btn" type="button">Add All (<span id="total-zones-count">0</span>)</button>
         </div>
         <button id="reset-offset-btn" class="primary" type="button">Reset to Now (0h)</button>
       </div>
@@ -262,179 +307,75 @@
     };
 
     (function () {
-      const PRESET_ZONES = [
-        { city: "Dublin / Monksland", tz: "Europe/Dublin" },
-        { city: "London", tz: "Europe/London" },
-        { city: "New York", tz: "America/New_York" },
-        { city: "Chicago / Green Bay", tz: "America/Chicago" },
-        { city: "Los Angeles", tz: "America/Los_Angeles" },
-        { city: "Tokyo", tz: "Asia/Tokyo" },
-        { city: "Sydney", tz: "Australia/Sydney" },
-        { city: "Paris", tz: "Europe/Paris" },
-        { city: "Berlin", tz: "Europe/Berlin" },
-        { city: "Phnom Penh", tz: "Asia/Phnom_Penh" },
-        { city: "Reykjavik", tz: "Atlantic/Reykjavik" },
-        { city: "Auckland", tz: "Pacific/Auckland" }
-      ];
+      const FEATURED_LABELS = {
+        "Pacific/Pago_Pago": "Pago Pago (American Samoa)",
+        "Pacific/Apia": "Apia (Samoa)",
+        "Pacific/Honolulu": "Honolulu (Hawaii)",
+        "Pacific/Midway": "Midway Atoll",
+        "Pacific/Niue": "Niue",
+        "Pacific/Rarotonga": "Rarotonga (Cook Islands)",
+        "Pacific/Tahiti": "Tahiti",
+        "Pacific/Marquesas": "Marquesas Islands",
+        "Pacific/Gambier": "Gambier Islands",
+        "Pacific/Pitcairn": "Pitcairn Islands",
+        "Pacific/Galapagos": "Galapagos Islands",
+        "Pacific/Easter": "Easter Island",
+        "Pacific/Fiji": "Suva / Fiji",
+        "Pacific/Auckland": "Auckland (New Zealand)",
+        "Pacific/Chatham": "Chatham Islands",
+        "Pacific/Tongatapu": "Nukuʻalofa (Tonga)",
+        "Pacific/Kwajalein": "Kwajalein (Marshall Islands)",
+        "Pacific/Guam": "Hagåtña (Guam)",
+        "Pacific/Port_Moresby": "Port Moresby",
+        "Australia/Sydney": "Sydney",
+        "Australia/Melbourne": "Melbourne",
+        "Australia/Brisbane": "Brisbane",
+        "Australia/Perth": "Perth",
+        "Asia/Tokyo": "Tokyo",
+        "Asia/Seoul": "Seoul",
+        "Asia/Shanghai": "Shanghai / Beijing",
+        "Asia/Hong_Kong": "Hong Kong",
+        "Asia/Singapore": "Singapore",
+        "Asia/Bangkok": "Bangkok",
+        "Asia/Phnom_Penh": "Phnom Penh",
+        "Asia/Kolkata": "Mumbai / New Delhi (IST)",
+        "Asia/Dubai": "Dubai",
+        "Asia/Jerusalem": "Jerusalem",
+        "Africa/Cairo": "Cairo",
+        "Africa/Johannesburg": "Johannesburg",
+        "Africa/Lagos": "Lagos",
+        "Africa/Nairobi": "Nairobi",
+        "Atlantic/Reykjavik": "Reykjavik",
+        "Europe/Dublin": "Dublin / Monksland",
+        "Europe/London": "London",
+        "Europe/Lisbon": "Lisbon",
+        "Europe/Paris": "Paris",
+        "Europe/Berlin": "Berlin",
+        "Europe/Madrid": "Madrid",
+        "Europe/Rome": "Rome",
+        "Europe/Athens": "Athens",
+        "Europe/Moscow": "Moscow",
+        "America/New_York": "New York (Eastern)",
+        "America/Chicago": "Chicago / Green Bay (Central)",
+        "America/Denver": "Denver (Mountain)",
+        "America/Los_Angeles": "Los Angeles (Pacific)",
+        "America/Anchorage": "Anchorage (Alaska)",
+        "America/Toronto": "Toronto",
+        "America/Vancouver": "Vancouver",
+        "America/Mexico_City": "Mexico City",
+        "America/Sao_Paulo": "São Paulo",
+        "America/Argentina/Buenos_Aires": "Buenos Aires",
+        "America/Bogota": "Bogotá",
+        "America/Lima": "Lima",
+        "America/Santiago": "Santiago",
+        "Atlantic/Azores": "Azores",
+        "Atlantic/Cape_Verde": "Cape Verde",
+        "UTC": "Coordinated Universal Time (UTC)",
+        "GMT": "Greenwich Mean Time (GMT)"
+      };
 
-      let activeZones = [
-        "Europe/Dublin",
-        "America/New_York",
-        "America/Chicago",
-        "Asia/Tokyo",
-        "Europe/Paris",
-        "Australia/Sydney"
-      ];
+      const FALLBACK_ZONES = Object.keys(FEATURED_LABELS);
 
-      let hourOffset = 0;
-
-      function getOffsetLabel(tz, dateObj) {
-        try {
-          const parts = new Intl.DateTimeFormat("en-US", {
-            timeZone: tz,
-            timeZoneName: "shortOffset"
-          }).formatToParts(dateObj);
-          const tzPart = parts.find(function (p) { return p.type === "timeZoneName"; });
-          return tzPart ? tzPart.value : "UTC";
-        } catch (e) {
-          return "UTC";
-        }
-      }
-
-      function formatTime(tz, dateObj) {
-        return new Intl.DateTimeFormat("en-GB", {
-          timeZone: tz,
-          hour: "2-digit",
-          minute: "2-digit",
-          second: "2-digit",
-          hour12: false
-        }).format(dateObj);
-      }
-
-      function formatDate(tz, dateObj) {
-        return new Intl.DateTimeFormat("en-GB", {
-          timeZone: tz,
-          weekday: "short",
-          day: "2-digit",
-          month: "short",
-          year: "numeric"
-        }).format(dateObj);
-      }
-
-      function populateDropdown() {
-        const select = document.getElementById("add-zone-select");
-        select.innerHTML = "";
-        PRESET_ZONES.forEach(function (item) {
-          const opt = document.createElement("option");
-          opt.value = item.tz;
-          opt.textContent = item.city + " (" + item.tz + ")";
-          select.appendChild(opt);
-        });
-      }
-
-      function getCityName(tz) {
-        const match = PRESET_ZONES.find(function (z) { return z.tz === tz; });
-        if (match) return match.city;
-        const pieces = tz.split("/");
-        return pieces[pieces.length - 1].replace(/_/g, " ");
-      }
-
-      function renderCards(shiftedDate) {
-        const grid = document.getElementById("zones-grid");
-        grid.innerHTML = "";
-
-        activeZones.forEach(function (tz) {
-          const card = document.createElement("div");
-          card.className = "zone-card";
-
-          const top = document.createElement("div");
-          top.className = "zone-top";
-
-          const cityEl = document.createElement("div");
-          cityEl.className = "zone-city";
-          cityEl.textContent = getCityName(tz);
-
-          const offsetEl = document.createElement("span");
-          offsetEl.className = "zone-offset";
-          offsetEl.textContent = getOffsetLabel(tz, shiftedDate);
-
-          top.appendChild(cityEl);
-          top.appendChild(offsetEl);
-
-          const idEl = document.createElement("div");
-          idEl.className = "zone-id";
-          idEl.textContent = tz;
-
-          const clockEl = document.createElement("div");
-          clockEl.className = "zone-clock";
-          clockEl.textContent = formatTime(tz, shiftedDate);
-
-          const dateEl = document.createElement("div");
-          dateEl.className = "zone-date";
-          dateEl.textContent = formatDate(tz, shiftedDate);
-
-          card.appendChild(top);
-          card.appendChild(idEl);
-          card.appendChild(clockEl);
-          card.appendChild(dateEl);
-          grid.appendChild(card);
-        });
-      }
-
-      function updateClocks() {
-        const nowMs = Date.now() + hourOffset * 3600 * 1000;
-        const shiftedDate = new Date(nowMs);
-
-        const localTz = Intl.DateTimeFormat().resolvedOptions().timeZone || "UTC";
-        document.getElementById("hero-local-time").textContent = formatTime(localTz, shiftedDate);
-        document.getElementById("hero-local-meta").textContent = localTz + " • " + formatDate(localTz, shiftedDate);
-
-        document.getElementById("hero-gmt-time").textContent = formatTime("GMT", shiftedDate);
-        document.getElementById("hero-gmt-date").textContent = formatDate("GMT", shiftedDate);
-
-        renderCards(shiftedDate);
-      }
-
-      function init() {
-        populateDropdown();
-
-        const slider = document.getElementById("offset-slider");
-        const offsetReadout = document.getElementById("offset-readout");
-        const resetBtn = document.getElementById("reset-offset-btn");
-        const addBtn = document.getElementById("add-zone-btn");
-        const zoneSelect = document.getElementById("add-zone-select");
-
-        slider.addEventListener("input", function () {
-          hourOffset = parseInt(slider.value, 10) || 0;
-          offsetReadout.textContent = (hourOffset >= 0 ? "+" : "") + hourOffset + " hours";
-          updateClocks();
-        });
-
-        resetBtn.addEventListener("click", function () {
-          hourOffset = 0;
-          slider.value = "0";
-          offsetReadout.textContent = "+0 hours";
-          updateClocks();
-        });
-
-        addBtn.addEventListener("click", function () {
-          const chosen = zoneSelect.value;
-          if (chosen && activeZones.indexOf(chosen) === -1) {
-            activeZones.push(chosen);
-            updateClocks();
-          }
-        });
-
-        updateClocks();
-        setInterval(updateClocks, 1000);
-      }
-
-      if (document.readyState === "loading") {
-        document.addEventListener("DOMContentLoaded", init);
-      } else {
-        init();
-      }
-    })();
-  </script>
-</body>
-</html>
+      function getAllTimeZones() {
+        let zones = [];
+        if (typeof Intl !== "undefined" && typeof Intl.supported
