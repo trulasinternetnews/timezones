@@ -5,377 +5,135 @@
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>World Time Zones Explorer</title>
   <style>
-    * {
-      box-sizing: border-box;
-    }
-
+    * { box-sizing: border-box; }
     body {
       font-family: system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
-      margin: 0;
-      min-height: 100vh;
-      background: #0b1120;
-      color: #f8fafc;
-      padding: 2rem 1rem;
-      display: flex;
-      justify-content: center;
-      align-items: flex-start;
+      margin: 0; min-height: 100vh; background: #0b1120; color: #f8fafc;
+      padding: 2rem 1rem; display: flex; justify-content: center; align-items: flex-start;
     }
-
     .container {
-      width: 100%;
-      max-width: 920px;
-      background: #111827;
-      border: 1px solid #1e293b;
-      border-radius: 14px;
-      padding: 1.75rem;
-      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
+      width: 100%; max-width: 920px; background: #111827; border: 1px solid #1e293b;
+      border-radius: 14px; padding: 1.75rem; box-shadow: 0 20px 50px rgba(0, 0, 0, 0.45);
     }
-
-    h1 {
-      margin: 0 0 0.35rem;
-      font-size: 1.75rem;
-      color: #38bdf8;
-    }
-
-    .subtitle {
-      margin: 0 0 1.5rem;
-      color: #94a3b8;
-      font-size: 0.95rem;
-    }
-
-    .hero-clocks {
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
-      gap: 1rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .hero-box {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 1rem 1.25rem;
-    }
-
-    .hero-label {
-      font-size: 0.8rem;
-      text-transform: uppercase;
-      letter-spacing: 0.06em;
-      color: #94a3b8;
-      margin-bottom: 0.35rem;
-    }
-
-    .hero-time {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 1.65rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      color: #f8fafc;
-    }
-
-    .hero-sub {
-      font-size: 0.85rem;
-      color: #38bdf8;
-      margin-top: 0.25rem;
-    }
-
-    .controls-panel {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 1rem 1.25rem;
-      margin-bottom: 1.5rem;
-    }
-
-    .controls-row {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.6rem;
-      align-items: center;
-      justify-content: space-between;
-    }
-
-    .add-group {
-      display: flex;
-      flex-wrap: wrap;
-      gap: 0.5rem;
-      align-items: center;
-    }
-
-    .slider-wrap {
-      margin-top: 0.9rem;
-    }
-
-    .slider-header {
-      display: flex;
-      justify-content: space-between;
-      font-size: 0.88rem;
-      color: #cbd5e1;
-      margin-bottom: 0.4rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-    }
-
-    input[type="range"] {
-      width: 100%;
-      accent-color: #38bdf8;
-      cursor: pointer;
-    }
-
-    input[type="text"], select, button {
-      background: #1e293b;
-      color: #f8fafc;
-      border: 1px solid #334155;
-      border-radius: 8px;
-      padding: 0.55rem 0.8rem;
-      font-size: 0.9rem;
-    }
-
-    input[type="text"] {
-      min-width: 170px;
-    }
-
-    select {
-      max-width: 300px;
-      cursor: pointer;
-    }
-
-    button {
-      cursor: pointer;
-    }
-
-    button.primary {
-      background: #2563eb;
-      border-color: #3b82f6;
-      font-weight: 600;
-    }
-
-    button.primary:hover {
-      background: #1d4ed8;
-    }
-
-    button:hover {
-      background: #334155;
-    }
-
-    .zones-grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(245px, 1fr));
-      gap: 1rem;
-    }
-
-    .zone-card {
-      background: #0f172a;
-      border: 1px solid #1e293b;
-      border-radius: 10px;
-      padding: 1rem;
-      display: flex;
-      flex-direction: column;
-      gap: 0.3rem;
-      position: relative;
-    }
-
-    .zone-top {
-      display: flex;
-      justify-content: space-between;
-      align-items: baseline;
-      gap: 0.5rem;
-    }
-
-    .zone-city {
-      font-weight: 700;
-      font-size: 1.02rem;
-      color: #f8fafc;
-    }
-
-    .zone-badges {
-      display: flex;
-      align-items: center;
-      gap: 0.35rem;
-    }
-
-    .zone-offset {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.76rem;
-      color: #38bdf8;
-      background: rgba(56, 189, 248, 0.12);
-      padding: 0.15rem 0.45rem;
-      border-radius: 999px;
-      white-space: nowrap;
-    }
-
-    .remove-btn {
-      background: transparent;
-      border: 1px solid #334155;
-      color: #94a3b8;
-      padding: 0.1rem 0.4rem;
-      font-size: 0.75rem;
-      border-radius: 6px;
-      line-height: 1.2;
-    }
-
-    .remove-btn:hover {
-      color: #f8fafc;
-      background: #7f1d1d;
-      border-color: #ef4444;
-    }
-
-    .zone-id {
-      font-size: 0.78rem;
-      color: #64748b;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      word-break: break-word;
-    }
-
-    .zone-clock {
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 1.3rem;
-      font-weight: 700;
-      font-variant-numeric: tabular-nums;
-      margin-top: 0.25rem;
-    }
-
-    .zone-date {
-      font-size: 0.85rem;
-      color: #cbd5e1;
-    }
-
-    #error-banner {
-      display: none;
-      background: #7f1d1d;
-      color: #fef2f2;
-      border: 1px solid #ef4444;
-      padding: 0.75rem 1rem;
-      border-radius: 8px;
-      margin-bottom: 1rem;
-      font-family: ui-monospace, SFMono-Regular, Menlo, Consolas, monospace;
-      font-size: 0.85rem;
-    }
+    h1 { margin: 0 0 0.35rem; font-size: 1.75rem; color: #38bdf8; }
+    .subtitle { margin: 0 0 1.5rem; color: #94a3b8; font-size: 0.95rem; }
+    .hero-clocks { display: grid; grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); gap: 1rem; margin-bottom: 1.5rem; }
+    .hero-box { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 1rem 1.25rem; }
+    .hero-label { font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.06em; color: #94a3b8; margin-bottom: 0.35rem; }
+    .hero-time { font-family: ui-monospace, monospace; font-size: 1.65rem; font-weight: 700; color: #f8fafc; }
+    .hero-sub { font-size: 0.85rem; color: #38bdf8; margin-top: 0.25rem; }
+    .controls-panel { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 1rem 1.25rem; margin-bottom: 1.5rem; }
+    .controls-row { display: flex; flex-wrap: wrap; gap: 0.6rem; align-items: center; justify-content: space-between; }
+    .add-group { display: flex; flex-wrap: wrap; gap: 0.5rem; align-items: center; }
+    .slider-wrap { margin-top: 0.9rem; }
+    .slider-header { display: flex; justify-content: space-between; font-size: 0.88rem; color: #cbd5e1; margin-bottom: 0.4rem; font-family: ui-monospace, monospace; }
+    input[type="range"] { width: 100%; accent-color: #38bdf8; cursor: pointer; }
+    input[type="text"], select, button { background: #1e293b; color: #f8fafc; border: 1px solid #334155; border-radius: 8px; padding: 0.55rem 0.8rem; font-size: 0.9rem; }
+    button { cursor: pointer; }
+    button.primary { background: #2563eb; border-color: #3b82f6; font-weight: 600; }
+    .zones-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(245px, 1fr)); gap: 1rem; }
+    .zone-card { background: #0f172a; border: 1px solid #1e293b; border-radius: 10px; padding: 1rem; position: relative; }
+    .zone-city { font-weight: 700; color: #f8fafc; }
+    .zone-offset { font-family: ui-monospace, monospace; font-size: 0.76rem; color: #38bdf8; background: rgba(56, 189, 248, 0.12); padding: 0.15rem 0.45rem; border-radius: 999px; }
+    .remove-btn { position: absolute; top: 0.5rem; right: 0.5rem; background: transparent; border: none; color: #ef4444; cursor: pointer; }
+    .zone-clock { font-family: ui-monospace, monospace; font-size: 1.3rem; font-weight: 700; margin-top: 0.5rem; }
+    #error-banner { display: none; background: #7f1d1d; color: #fef2f2; padding: 0.75rem; border-radius: 8px; margin-bottom: 1rem; }
   </style>
 </head>
 <body>
   <div class="container">
     <div id="error-banner"></div>
-
     <h1>World Time Zones Explorer</h1>
-    <p class="subtitle">Browse world time zones—including Pago Pago and Apia—check live clocks and offsets, or scrub hours forward and backward.</p>
-
+    <p class="subtitle">Browse world time zones, check live clocks and offsets.</p>
     <div class="hero-clocks">
       <div class="hero-box">
         <div class="hero-label">Your Local Time</div>
         <div id="hero-local-time" class="hero-time">--:--:--</div>
-        <div id="hero-local-meta" class="hero-sub">Detecting time zone...</div>
+        <div id="hero-local-meta" class="hero-sub">Detecting...</div>
       </div>
-
       <div class="hero-box">
-        <div class="hero-label">Greenwich Mean Time (GMT)</div>
+        <div class="hero-label">GMT</div>
         <div id="hero-gmt-time" class="hero-time">--:--:--</div>
-        <div id="hero-gmt-date" class="hero-sub">Loading GMT...</div>
+        <div id="hero-gmt-date" class="hero-sub">Loading...</div>
       </div>
     </div>
-
     <div class="controls-panel">
       <div class="controls-row">
         <div class="add-group">
-          <input id="zone-filter-input" type="text" placeholder="Filter (e.g. Pago Pago, Apia)..." aria-label="Filter time zones">
-          <select id="add-zone-select" aria-label="Select time zone"></select>
+          <select id="add-zone-select"></select>
           <button id="add-zone-btn" type="button">Add Clock</button>
-          <button id="add-all-btn" type="button">Add All (<span id="total-zones-count">0</span>)</button>
         </div>
-        <button id="reset-offset-btn" class="primary" type="button">Reset to Now (0h)</button>
+        <button id="reset-offset-btn" class="primary">Reset (0h)</button>
       </div>
-
       <div class="slider-wrap">
-        <div class="slider-header">
-          <span>Time Shift Offset:</span>
-          <strong id="offset-readout">+0 hours</strong>
-        </div>
-        <input id="offset-slider" type="range" min="-24" max="24" step="1" value="0">
+        <div class="slider-header"><span>Time Shift:</span> <strong id="offset-readout">+0 hours</strong></div>
+        <input id="offset-slider" type="range" min="-24" max="24" value="0">
       </div>
     </div>
-
     <div id="zones-grid" class="zones-grid"></div>
   </div>
 
   <script>
-    window.onerror = function (msg, url, line) {
-      var banner = document.getElementById("error-banner");
-      if (banner) {
-        banner.style.display = "block";
-        banner.textContent = "JS Error (line " + line + "): " + msg;
-      }
-      return false;
-    };
-
     (function () {
-      const FEATURED_LABELS = {
-        "Pacific/Pago_Pago": "Pago Pago (American Samoa)",
-        "Pacific/Apia": "Apia (Samoa)",
-        "Pacific/Honolulu": "Honolulu (Hawaii)",
-        "Pacific/Midway": "Midway Atoll",
-        "Pacific/Niue": "Niue",
-        "Pacific/Rarotonga": "Rarotonga (Cook Islands)",
-        "Pacific/Tahiti": "Tahiti",
-        "Pacific/Marquesas": "Marquesas Islands",
-        "Pacific/Gambier": "Gambier Islands",
-        "Pacific/Pitcairn": "Pitcairn Islands",
-        "Pacific/Galapagos": "Galapagos Islands",
-        "Pacific/Easter": "Easter Island",
-        "Pacific/Fiji": "Suva / Fiji",
-        "Pacific/Auckland": "Auckland (New Zealand)",
-        "Pacific/Chatham": "Chatham Islands",
-        "Pacific/Tongatapu": "Nukuʻalofa (Tonga)",
-        "Pacific/Kwajalein": "Kwajalein (Marshall Islands)",
-        "Pacific/Guam": "Hagåtña (Guam)",
-        "Pacific/Port_Moresby": "Port Moresby",
-        "Australia/Sydney": "Sydney",
-        "Australia/Melbourne": "Melbourne",
-        "Australia/Brisbane": "Brisbane",
-        "Australia/Perth": "Perth",
-        "Asia/Tokyo": "Tokyo",
-        "Asia/Seoul": "Seoul",
-        "Asia/Shanghai": "Shanghai / Beijing",
-        "Asia/Hong_Kong": "Hong Kong",
-        "Asia/Singapore": "Singapore",
-        "Asia/Bangkok": "Bangkok",
-        "Asia/Phnom_Penh": "Phnom Penh",
-        "Asia/Kolkata": "Mumbai / New Delhi (IST)",
-        "Asia/Dubai": "Dubai",
-        "Asia/Jerusalem": "Jerusalem",
-        "Africa/Cairo": "Cairo",
-        "Africa/Johannesburg": "Johannesburg",
-        "Africa/Lagos": "Lagos",
-        "Africa/Nairobi": "Nairobi",
-        "Atlantic/Reykjavik": "Reykjavik",
-        "Europe/Dublin": "Dublin / Monksland",
-        "Europe/London": "London",
-        "Europe/Lisbon": "Lisbon",
-        "Europe/Paris": "Paris",
-        "Europe/Berlin": "Berlin",
-        "Europe/Madrid": "Madrid",
-        "Europe/Rome": "Rome",
-        "Europe/Athens": "Athens",
-        "Europe/Moscow": "Moscow",
-        "America/New_York": "New York (Eastern)",
-        "America/Chicago": "Chicago / Green Bay (Central)",
-        "America/Denver": "Denver (Mountain)",
-        "America/Los_Angeles": "Los Angeles (Pacific)",
-        "America/Anchorage": "Anchorage (Alaska)",
-        "America/Toronto": "Toronto",
-        "America/Vancouver": "Vancouver",
-        "America/Mexico_City": "Mexico City",
-        "America/Sao_Paulo": "São Paulo",
-        "America/Argentina/Buenos_Aires": "Buenos Aires",
-        "America/Bogota": "Bogotá",
-        "America/Lima": "Lima",
-        "America/Santiago": "Santiago",
-        "Atlantic/Azores": "Azores",
-        "Atlantic/Cape_Verde": "Cape Verde",
-        "UTC": "Coordinated Universal Time (UTC)",
-        "GMT": "Greenwich Mean Time (GMT)"
+      const zones = Intl.supportedValuesOf('timeZone');
+      const select = document.getElementById('add-zone-select');
+      const grid = document.getElementById('zones-grid');
+      const slider = document.getElementById('offset-slider');
+      const readout = document.getElementById('offset-readout');
+      let activeZones = ["America/New_York", "Europe/London", "Asia/Tokyo"];
+      let offset = 0;
+
+      function updateClocks() {
+        const now = new Date();
+        const adjustedNow = new Date(now.getTime() + offset * 3600000);
+        
+        document.getElementById('hero-local-time').textContent = adjustedNow.toLocaleTimeString();
+        document.getElementById('hero-local-meta').textContent = Intl.DateTimeFormat().resolvedOptions().timeZone;
+        document.getElementById('hero-gmt-time').textContent = adjustedNow.toLocaleTimeString('en-GB', { timeZone: 'UTC' });
+        document.getElementById('offset-readout').textContent = (offset >= 0 ? '+' : '') + offset + ' hours';
+
+        grid.innerHTML = '';
+        activeZones.forEach(zone => {
+          const time = adjustedNow.toLocaleTimeString('en-US', { timeZone: zone, hour12: false });
+          const card = document.createElement('div');
+          card.className = 'zone-card';
+          card.innerHTML = `
+            <div class="zone-city">${zone.split('/').pop().replace('_', ' ')}</div>
+            <div class="zone-clock">${time}</div>
+            <button class="remove-btn" onclick="removeZone('${zone}')">✕</button>
+          `;
+          grid.appendChild(card);
+        });
+      }
+
+      window.removeZone = (zone) => {
+        activeZones = activeZones.filter(z => z !== zone);
+        updateClocks();
       };
 
-      const FALLBACK_ZONES = Object.keys(FEATURED_LABELS);
+      zones.forEach(zone => {
+        const opt = document.createElement('option');
+        opt.value = zone; opt.textContent = zone;
+        select.appendChild(opt);
+      });
 
-      function getAllTimeZones() {
-        let zones = [];
-        if (typeof Intl !== "undefined" && typeof Intl.supported
+      document.getElementById('add-zone-btn').onclick = () => {
+        if (!activeZones.includes(select.value)) activeZones.push(select.value);
+        updateClocks();
+      };
+
+      document.getElementById('reset-offset-btn').onclick = () => {
+        slider.value = 0; offset = 0; updateClocks();
+      };
+
+      slider.oninput = (e) => {
+        offset = parseInt(e.target.value);
+        updateClocks();
+      };
+
+      setInterval(updateClocks, 1000);
+      updateClocks();
+    })();
+  </script>
+</body>
+</html>
